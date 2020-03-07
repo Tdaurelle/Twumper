@@ -1,6 +1,6 @@
 # Twumper
-Twitter Trump Analyzer 
+Twitter Dump Analyzer 
 
-This project is the best. the best project. gonna be yuuuuge.
+This project is NOT the best. the best project. gonna be yuuuuge.
 
 No one has ever seen a project so great.
