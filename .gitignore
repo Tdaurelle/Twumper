@@ -2,3 +2,4 @@ env/*
 .DS_Store
 .idea/*
 *.pyc
+twitter-api/twitter_credentials.json
