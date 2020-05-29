@@ -23,22 +23,24 @@ source env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
-### Create a credentials file.
-# Log in to apps.twitter.com
+### Create credentials and write creds.py file.
+# Log in to developer.twitter.com
 # Click [Create New App]
 # Navigate to [Keys and Access Tokens]
 # Click [Create my access token]
 # Open Twumper/twitter-api/creds_template.py and fill in the details, saving the file as creds.py
-# Create credentials file and delete script
 
+# Create credentials file and delete script
 ```
-python3 creds.py
-rm creds.py
+python3 ./twitter-api/creds.py
+rm ./twitter-api/creds.py
 ```
 
 # Protect your credentials file
 
 ```
-chmod 700 twitter_credentials.json
+chmod 700 ./twitter-api/twitter_credentials.json
 ```
+
+
 
