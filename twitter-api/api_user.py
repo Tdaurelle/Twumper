@@ -80,7 +80,10 @@ for status in response['statuses']:
 
 # instantiate an object
 python_tweets = Twython(creds['CONSUMER_KEY'], creds['CONSUMER_SECRET'], oauth_version=2)
-ACCESS_TOKEN = python_tweets.obtain_access_token()
+# ACCESS_TOKEN = python_tweets.obtain_access_token()
+with open('./twitter-api/ACCESS_TOKEN.txt','r') as f:
+    ACCESS_TOKEN = f.read()
+
 client_args = {
     'headers': {
         'Authorization': 'Bearer ' + ACCESS_TOKEN

@@ -8,11 +8,9 @@
 from twython import Twython
 import json
 import pandas as pd
+import numpy as np
+import datetime as dt
 
-# define arguments
-query_text = 'italian'
-num_per_query = 10
-num_queries = 4
 
 # load credentials
 with open("./twitter-api/twitter_credentials.json", "r") as file:
@@ -22,29 +20,34 @@ with open("./twitter-api/twitter_credentials.json", "r") as file:
 python_tweets = Twython(creds['CONSUMER_KEY'], creds['CONSUMER_SECRET'])
 # ACCESS_TOKEN = python_tweets.obtain_access_token()
 
-# create query
-query = {'q': query_text,
-         'result_type': 'recent',
-         'count': num_per_query,
-         'lang': 'en'
-         }
+# create dictionary of activity to track response count by timestamp
+num_responses = {}
+print("{} responses so far.".format(np.sum([num_responses[k] for k in num_responses.keys()])))
 
-# search
-dict_ = {'user': [], 'user_id': [], 'date': [], 'text': [], 'favorite_count': [], 'id': []}
-for status in python_tweets.search(**query)['statuses']:
-    dict_['user'].append(status['user']['screen_name'])
-    dict_['user_id'].append(status['user']['id'])
-    dict_['date'].append(status['created_at'])
-    dict_['text'].append(status['text'])
-    dict_['favorite_count'].append(status['favorite_count'])
-    dict_['id'].append(status['id'])
 
-print("dict_ now of length {}".format(len(dict_['id'])))
-query_count = 1
+def response_count():
+    now_ = dt.datetime.now()
+    start_ = dt.timedelta(seconds=-15*60) + now_
+    now_ts = now_.timestamp()
+    start_ts = start_.timestamp()
+    query_times = np.where( (np.array(list(num_responses)) < now_ts) & (np.array(list(num_responses)) >= start_ts) )[0]
+    return len(query_times)
 
-while (len(response) > 0) & (query_count < num_queries):
-    latest = dict_['id'][-1]
-    query['max_id'] = latest
+
+def tweet_scrape(query_text: str='italian', num_per_query: int=10)
+    # define arguments
+    query_text = 'italian'
+    num_per_query = 10
+
+    # create query
+    query = {'q': query_text,
+             'result_type': 'recent',
+             'count': num_per_query,
+             'lang': 'en'
+             }
+
+    # search
+    dict_ = {'user': [], 'user_id': [], 'date': [], 'text': [], 'favorite_count': [], 'id': []}
     for status in python_tweets.search(**query)['statuses']:
         dict_['user'].append(status['user']['screen_name'])
         dict_['user_id'].append(status['user']['id'])
@@ -52,8 +55,25 @@ while (len(response) > 0) & (query_count < num_queries):
         dict_['text'].append(status['text'])
         dict_['favorite_count'].append(status['favorite_count'])
         dict_['id'].append(status['id'])
-    print("dict_ now of length {}".format(len(dict_['id'])))
-    query_count += 1
+
+    # print("dict_ now of length {}".format(len(dict_['id'])))
+    query_count = 1
+    ### TODO: Incorporate response_count() function into stopping calls
+    while (len(response) > 0) & (query_count < 10):
+        latest = dict_['id'][-1]
+        query['max_id'] = latest
+        for status in python_tweets.search(**query)['statuses']:
+            dict_['user'].append(status['user']['screen_name'])
+            dict_['user_id'].append(status['user']['id'])
+            dict_['date'].append(status['created_at'])
+            dict_['text'].append(status['text'])
+            dict_['favorite_count'].append(status['favorite_count'])
+            dict_['id'].append(status['id'])
+        print("dict_ now of length {}".format(len(dict_['id'])))
+        query_count += 1
+    return dict_
+
+def user_scrape(user_list):
 
 # Structure data in a pandas DataFrame for easier manipulation
 df = pd.DataFrame(dict_)
